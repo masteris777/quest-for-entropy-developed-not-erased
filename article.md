@@ -143,7 +143,7 @@ Wheeler proposed the delayed choice in 1978, and Jacques and colleagues realized
 
 The whole run, one action at a time, with every dial: [the bench](https://questforentropy.com/p/developed-not-erased/bench). The arrow picture of where the fringe goes: [Fringe Arrows](https://questforentropy.com/p/developed-not-erased/fringe-arrows). The quantum-computer run, one script, the simulator by default and IBM hardware with your own free account: [github.com/masteris777/quest-for-entropy-developed-not-erased](https://github.com/masteris777/quest-for-entropy-developed-not-erased), one command: `python order_test_qiskit.py`. The raw counts from our hardware run are in the repository, so you can check our numbers without a quantum computer.
 
-Archived: DOI (to follow).
+Archived: DOI [10.5281/zenodo.22991160](https://zenodo.org/records/22991160).
 
 ## How this was made
 
