@@ -1,0 +1,573 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nothing to Erase</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+  :root{
+    --ground:#f6f5f1; --surface:#ffffff; --sunk:#efece5;
+    --ink:#23201c; --muted:#77736c; --rule:#e0dbd2;
+    --p:#c07016; --p-soft:#f6e6d1; --m:#6b4fbb; --m-soft:#e6e0f5; --d:#12806f; --d-soft:#d9ece7; --d2:#2d64a8; --d2-soft:#dde7f4;
+    --flag:#b83a2b;
+    --shadow:0 1px 2px rgba(35,32,28,.06), 0 8px 24px rgba(35,32,28,.05);
+    --serif:"IBM Plex Serif",Georgia,serif;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#181715; --surface:#221f1c; --sunk:#1e1c1a;
+      --ink:#ece6dc; --muted:#98918a; --rule:#35322d;
+      --p:#e09a45; --p-soft:#3a2c19; --m:#a48ce8; --m-soft:#2b2440; --d:#46bda9; --d-soft:#153029; --d2:#72a3e3; --d2-soft:#18263a;
+      --flag:#e0715f;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#181715; --surface:#221f1c; --sunk:#1e1c1a;
+    --ink:#ece6dc; --muted:#98918a; --rule:#35322d;
+    --p:#e09a45; --p-soft:#3a2c19; --m:#a48ce8; --m-soft:#2b2440; --d:#46bda9; --d-soft:#153029; --d2:#72a3e3; --d2-soft:#18263a;
+    --flag:#e0715f;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.5;margin:0}
+  .wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:32px 56px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.1;margin:.2em 0 .15em;letter-spacing:-.01em}
+  h2{font-family:var(--serif);font-weight:600;font-size:19px;margin:0;line-height:1.2}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+  .lede{color:var(--muted);max-width:74ch;margin:0 0 18px}
+  .lede b{color:var(--ink);font-weight:500}
+
+  button{font:500 14px/1 var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--rule);
+         border-radius:8px;padding:9px 14px;cursor:pointer;transition:background .12s,border-color .12s,transform .08s}
+  button:hover:not(:disabled){background:var(--sunk)}
+  button:active:not(:disabled){transform:translateY(1px)}
+  button:disabled{opacity:.38;cursor:not-allowed}
+  button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+  .big{font-weight:600;border-color:var(--ink)}
+
+  .bar{position:sticky;top:0;z-index:5;background:var(--ground);border-bottom:1px solid var(--rule);
+       display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:10px 0;margin-bottom:6px}
+  .bar .spacer{flex:1 1 auto}
+  .switch{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer;user-select:none;
+          border:1px solid var(--m);color:var(--m);border-radius:8px;padding:6px 12px;font-weight:600;background:var(--surface)}
+  .switch input{accent-color:var(--m);width:16px;height:16px;margin:0}
+  .where{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+  /* ---- the conveyor: one row per station --------------------------------------------- */
+  .belt{margin-top:8px}
+  .row{display:grid;grid-template-columns:250px 230px minmax(0,1fr);gap:0 22px}
+  .row .tables{justify-self:end;padding:14px 0;display:flex;flex-direction:column;gap:12px;align-items:flex-end;min-width:0}
+  .row .say{padding:14px 0;font-size:14.5px;max-width:52ch}
+  .row .say p{margin:0 0 .6em}
+  .row .say b{font-weight:600}
+  .track{position:relative;display:flex;align-items:flex-start;justify-content:center}
+  .track::before{content:"";position:absolute;left:calc(50% - 2px);top:0;bottom:0;width:4px;background:var(--rule)}
+  .track::before{
+    background:repeating-linear-gradient(to bottom,var(--p) 0 9px,transparent 9px 15px);animation:roll 1.1s linear infinite}
+  @keyframes roll{from{background-position:0 0}to{background-position:0 15px}}
+  .station{position:relative;z-index:1;margin:14px 0;width:220px;background:var(--surface);border:1px solid var(--rule);
+           border-radius:10px;padding:9px 11px 10px;box-shadow:var(--shadow)}
+  .station .nm{font-weight:600;font-size:14px;line-height:1.25}
+  .station .nm .k{font-family:var(--mono);font-size:11px;color:var(--muted);font-weight:500;margin-right:4px}
+  .station .op{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:2px}
+  .station.p{border-left:4px solid var(--p)} .station.m{border-left:4px solid var(--m)}
+  .station.d{border-left:4px solid var(--d)} .station.d2{border-left:4px solid var(--d2)}
+  .ctl{display:grid;grid-template-columns:auto 1fr auto;gap:2px 8px;align-items:center;margin-top:6px}
+  .ctl label{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .ctl input[type=range]{width:100%;accent-color:var(--ink);margin:0}
+  .ctl .out{font-family:var(--mono);font-size:12px;min-width:3.2em;text-align:right}
+  .ctl .out.off{color:var(--flag)}
+  .station .mtog{position:absolute;top:8px;right:9px;display:flex;align-items:center;gap:5px;font-family:var(--mono);font-size:10.5px;
+                  letter-spacing:.06em;text-transform:uppercase;color:var(--m);cursor:pointer;user-select:none}
+  .station .mtog input{accent-color:var(--m);width:15px;height:15px;margin:0;cursor:pointer}
+  .station.hastog .nm{padding-right:44px}
+  .nextp{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:8px;padding-top:7px;border-top:1px dashed var(--rule);
+         font-family:var(--mono);font-size:11px;color:var(--muted)}
+  .nextp button{font:500 11.5px var(--mono);padding:4px 9px;border-radius:6px}
+  .row.off .station:not(.hastog), .row.off .say{opacity:.42;filter:grayscale(1)}
+  .row.off .station.hastog{border-style:dashed}
+  .row.off .station.hastog .ctl{opacity:.42}
+  .row.off .say{font-style:italic}
+  @media (max-width:860px){
+    .row{grid-template-columns:minmax(0,1fr);border-top:1px solid var(--rule)}
+    .track{order:1;justify-content:flex-start} .track::before{display:none}
+    .station{width:100%;max-width:420px}
+    .row .tables{order:2;justify-self:start;align-items:flex-start;padding-top:0}
+    .row .say{order:3;padding-top:0}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+  /* ---- tables ------------------------------------------------------------------------ */
+  .tblwrap{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+  @media (max-width:860px){.tblwrap{align-items:flex-start}}
+  .tcap{font-family:var(--mono);font-size:10.5px;color:var(--muted);letter-spacing:.04em}
+  .blocks{display:flex;flex-direction:column;gap:8px;align-items:flex-end}
+  @media (max-width:860px){.blocks{align-items:flex-start}}
+  .tbl{display:grid;gap:4px;align-items:center;justify-items:center}
+  .sub{display:flex;flex-direction:column;align-items:center;gap:3px;border:1px dashed var(--rule);border-radius:8px;padding:4px 6px}
+  .axl{font-family:var(--mono);font-size:10.5px;color:var(--muted);white-space:nowrap;text-align:center;line-height:1.2}
+  .axl.p{color:var(--p)} .axl.m{color:var(--m)} .axl.d{color:var(--d)} .axl.d2{color:var(--d2)}
+  .axl small{display:block;color:var(--muted);font-size:9.5px}
+  .cell{width:48px;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .cell svg{width:38px;height:38px;display:block}
+  .cell .num{font-family:var(--mono);font-size:10px;white-space:nowrap}
+  .cell.dead{opacity:.25}
+  .cell.posted svg{outline:2px solid var(--flag);outline-offset:-1px;border-radius:50%}
+  .arrowdn{font-family:var(--mono);font-size:11px;color:var(--muted);align-self:center}
+  .chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .chip{font-family:var(--mono);font-size:11px;border:1.5px solid var(--flag);color:var(--flag);border-radius:12px;padding:2px 9px;white-space:nowrap}
+  .none{font-size:13px;color:var(--muted);font-style:italic}
+
+  details.ticks{margin-top:6px}
+  details.ticks summary{font-family:var(--mono);font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);cursor:pointer}
+  .work{font-family:var(--mono);font-size:11.5px;line-height:1.55;background:var(--sunk);border-radius:8px;padding:10px 12px;overflow-x:auto;white-space:pre;margin-top:6px}
+  .work .flag{color:var(--flag)}
+
+  /* ---- results ------------------------------------------------------------------------ */
+  .panel{background:var(--surface);border:1px solid var(--rule);border-radius:12px;box-shadow:var(--shadow);padding:20px;margin-top:28px}
+  .head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;margin-bottom:10px}
+  .hint{font-size:13px;color:var(--muted)}
+  select{font:500 14px var(--sans);color:var(--ink);background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:7px 8px}
+  .chart{width:100%;height:auto;display:block}
+  .series{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:6px 18px;margin-top:8px}
+  .series label{display:flex;gap:8px;align-items:flex-start;font-size:13px;cursor:pointer}
+  .series input{margin-top:3px}
+  .series i{flex:0 0 22px;height:0;border-top:3px solid var(--col);margin-top:9px}
+  .series i.dot{border-top-style:dotted}
+  .status{font-size:13px;color:var(--muted);margin-top:8px;min-height:1.4em}
+  .notclaimed{font-size:13px;color:var(--muted);max-width:80ch;margin-top:18px;padding-top:12px;border-top:1px solid var(--rule)}
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">Quest for Entropy · the toy, by hand</p>
+  <h1>Nothing to Erase</h1>
+  <p class="lede">One photon, Wheeler's interferometer, the table of the last episode. The run is a <b>conveyor</b>: the photon moves down through the stations, and the whole run is always shown. Tables are on the left and what happens is on the right. In the middle, each station shows its quantum-computer operation in brackets. Each station also has dials to play with. Every change reruns everything below it, and the counts too. The defaults are the real experiment; reload the page to get them back. The <b>marker</b> M has a switch on its own station: switch it off and its stations grey out.</p>
+
+
+  <div class="belt" id="belt"></div>
+
+  <section class="panel">
+    <div class="head"><h2>Many photons, counted</h2>
+      <span class="hint">the whole run above, repeated at every delay φ from 0° to 360°, with all the other dials as set above</span>
+      <span style="flex:1 1 auto"></span>
+      <select id="nshots" aria-label="photons per delay"><option value="100">100 per delay</option><option value="300" selected>300 per delay</option><option value="1000">1000 per delay</option></select>
+      <button id="count">Count again</button></div>
+    <svg class="chart" id="chart" viewBox="0 0 720 290" role="img" aria-label="share of photons at detector 0 against the delay, for each series"></svg>
+    <div class="series" id="series"></div>
+    <p class="hint" style="max-width:80ch;margin:10px 0 0">Every line is the same kind of number: the <b>share of photons whose D1 said 0</b> (detector 0), inside one group. Solid lines with dots are counted, one signed fact per photon. Dashed lines are the key: |arrow|² read off the table, with no counting. The groups are made afterwards, by D2's answer (M's reader); no photon changes group or detector.</p>
+    <div class="status" id="status"></div>
+    <p class="notclaimed"><b>Not claimed:</b> that the toy explains the arrows. The turns, the delay and the meetings are standard quantum arithmetic, imported as in the last episode, and every count on this page is the one quantum mechanics predicts. What the page shows is that a ledger on which a meeting is only a promise needs no photon that waits and no message to the past. The toy is told where the settlements happen: at D1, and at D2. <b>On the brackets:</b> the toy's turn with dial θ is RX(−2θ). At 45° it does the job of H in the circuit (a beam splitter), up to the i that the toy's turn carries.</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const RAD = Math.PI / 180;
+
+  // ---- complex arithmetic and the turn (the table bench's rule) -------------------------
+  const C = (re, im) => ({re: re, im: im || 0});
+  const cadd = (a,b) => C(a.re+b.re, a.im+b.im);
+  const cmul = (a,b) => C(a.re*b.re - a.im*b.im, a.re*b.im + a.im*b.re);
+  const cscale = (a,s) => C(a.re*s, a.im*s);
+  const cimul = a => C(-a.im, a.re);
+  const cexp = t => C(Math.cos(t), Math.sin(t));
+  const abs2 = a => a.re*a.re + a.im*a.im;
+  function turnPair(z0, z1, t){
+    const c = Math.cos(t), s = Math.sin(t);
+    return [cadd(cscale(z0,c), cscale(cimul(z1),s)), cadd(cscale(cimul(z0),s), cscale(z1,c))];
+  }
+  function fmt(z){
+    let re = Math.round(z.re*100)/100, im = Math.round(z.im*100)/100;
+    if(re === 0) re = 0; if(im === 0) im = 0;
+    if(Math.abs(im) < 0.005) return re.toFixed(2).replace("-","−");
+    if(Math.abs(re) < 0.005) return im.toFixed(2).replace("-","−") + "i";
+    return re.toFixed(2).replace("-","−") + (im > 0 ? "+" : "−") + Math.abs(im).toFixed(2) + "i";
+  }
+
+  // ---- blocks: threads written as one table; index bits in thread order (first = highest) --
+  const CLS = {P:"p", M:"m", D1:"d", D2:"d2"};
+  const bit = (b, name) => b.th.length - 1 - b.th.indexOf(name);
+  function fresh(name, dial, phase){
+    const z = turnPair(C(1,0), C(0,0), dial); z[1] = cmul(z[1], cexp(phase));
+    return {th:[name], Z:z};
+  }
+  function turnT(b, name, t){
+    const k = bit(b, name), Z = b.Z.slice();
+    for(let i=0;i<Z.length;i++) if(!((i >> k) & 1)){ const j = i | (1 << k), r = turnPair(Z[i], Z[j], t); Z[i] = r[0]; Z[j] = r[1]; }
+    return {th:b.th, Z:Z};
+  }
+  function phaseT(b, name, phi){
+    const k = bit(b, name), e = cexp(phi);
+    return {th:b.th, Z:b.Z.map((z,i) => ((i >> k) & 1) ? cmul(z, e) : z)};
+  }
+  function product(a, b){
+    const Z = [];
+    for(let i=0;i<a.Z.length;i++) for(let j=0;j<b.Z.length;j++) Z.push(cmul(a.Z[i], b.Z[j]));
+    return {th:a.th.concat(b.th), Z:Z};
+  }
+  function swapWhere(b, ctrl, tgt){            // the swap: where ctrl reads 1, tgt's cells trade places
+    const kc = bit(b, ctrl), kt = bit(b, tgt), Z = b.Z.slice();
+    for(let i=0;i<Z.length;i++) if(((i >> kc) & 1) && !((i >> kt) & 1)){ const j = i | (1 << kt), t = Z[i]; Z[i] = Z[j]; Z[j] = t; }
+    return {th:b.th, Z:Z};
+  }
+
+  // ---- the world: open blocks + signed facts ---------------------------------------------
+  const clone = w => ({blocks:w.blocks.map(b => ({th:b.th.slice(), Z:b.Z.slice()})), facts:w.facts.slice()});
+  const find = (w, name) => w.blocks.findIndex(b => b.th.indexOf(name) >= 0);
+  function onBlock(w, name, f){ const i = find(w, name); w.blocks[i] = f(w.blocks[i]); }
+  function meetW(w, ctrl, tgt){                // the product (if the threads are apart), then the swap
+    let i = find(w, ctrl), j = find(w, tgt);
+    if(i !== j){ const m = product(w.blocks[i], w.blocks[j]); w.blocks = w.blocks.filter((_,k) => k !== i && k !== j); w.blocks.push(m); }
+    onBlock(w, ctrl, b => swapWhere(b, ctrl, tgt));
+  }
+
+  // ---- unitdraws: a hash chain per book -------------------------------------------------
+  function fnv(s){
+    let h = 2166136261 >>> 0;
+    for(let i=0;i<s.length;i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; }
+    h ^= h >>> 16; h = Math.imul(h, 2246822507) >>> 0;
+    h ^= h >>> 13; h = Math.imul(h, 3266489909) >>> 0;
+    h ^= h >>> 16;
+    return h >>> 0;
+  }
+  let chains = {};
+  function unitdraw(name){ let c = chains[name]; if(!c) c = chains[name] = {n:0}; c.n++; return fnv(name + "#" + c.n) / 4294967296; }   // the book's n-th draw: no cycles on long counts
+
+  // ---- the settlement: two books sign one line of their joint axis ------------------------
+  // candidates = the four (a, b) lines; the ruler lays their LENGTHS end to end; each book draws;
+  // the same candidate twice is a fact (odds come out as length², as in the last episode)
+  function settleW(w, a, bname, tag){
+    const i = find(w, a), B = w.blocks[i], ka = bit(B, a), kb = bit(B, bname);
+    const odds = [0,0,0,0];
+    B.Z.forEach((z, idx) => { odds[2*((idx >> ka) & 1) + ((idx >> kb) & 1)] += abs2(z); });
+    const L = odds.map(Math.sqrt), tot = L.reduce((s,x) => s+x, 0), share = L.map(x => x/tot);
+    const pick = u => { let acc = 0; for(let k=0;k<4;k++){ acc += share[k]; if(u < acc && share[k] > 0) return k; } for(let k=3;k>=0;k--) if(share[k] > 0) return k; };
+    const ticks = []; let line = -1;
+    for(let g=0; g<500 && line < 0; g++){
+      const ua = unitdraw(tag + a), ub = unitdraw(tag + bname), sa = pick(ua), sb = pick(ub);
+      ticks.push({ua:ua, ub:ub, sa:sa, sb:sb}); if(sa === sb) line = sa;
+    }
+    const va = line >> 1, vb = line & 1, before = {th:B.th.slice(), Z:B.Z.slice()};
+    const rest = B.th.filter(t => t !== a && t !== bname);
+    const keepZ = [];
+    B.Z.forEach((z, idx) => { if(((idx >> ka) & 1) === va && ((idx >> kb) & 1) === vb) keepZ.push(z); });
+    const n = Math.sqrt(keepZ.reduce((s,z) => s + abs2(z), 0)) || 1;
+    w.blocks.splice(i, 1);
+    if(rest.length) w.blocks.push({th:rest, Z:keepZ.map(z => cscale(z, 1/n))});   // indices keep their order: the kept cells ARE the rest's table
+    w.facts.push({a:a, b:bname, va:va, vb:vb});
+    return {before:before, a:a, b:bname, va:va, vb:vb, share:share, odds:odds, ticks:ticks, ka:ka, kb:kb};
+  }
+
+  // ---- the dials -----------------------------------------------------------------------------
+  const DEF = {Pd:0, Pp:0, split:45, Md:0, Mp:0, phi:60, join:45, Dd:0, Dp:0, late:45, D2d:0, D2p:0};
+  let cfg = Object.assign({}, DEF), mOn = true;
+  const turnOp = d => "[RX(−" + (2*d) + "°)" + (d === 45 ? " ≈ H" : "") + "]";
+  const arriveOp = (d, p) => "[|0⟩" + (d ? " · RX(−" + (2*d) + "°)" : "") + (p ? " · P(" + p + "°)" : "") + "]";
+  const pair = (dk, pk) => [{k:dk, label:"dial", max:90, step:5}, {k:pk, label:"phase", max:360, step:15}];
+
+  // ---- the stations --------------------------------------------------------------------------
+  function stations(c, withM){
+    const S = [];
+    S.push({key:"P", cls:"p", name:"photon P arrives", op:() => arriveOp(c.Pd, c.Pp), ctl:pair("Pd","Pp"),
+            act:(w, L) => { w.blocks.push(fresh("P", c.Pd*RAD, c.Pp*RAD)); L.P = ["", ""]; }});
+    S.push({key:"split", cls:"p", name:"splitter 1 · the halfway turn", op:() => turnOp(c.split), ctl:[{k:"split", label:"dial", max:90, step:5}],
+            act:(w, L) => { onBlock(w, "P", b => turnT(b, "P", c.split*RAD)); L.P = ["upper arm", "lower arm"]; }});
+    if(withM){
+      S.push({key:"M", cls:"m", name:"marker M arrives", op:() => arriveOp(c.Md, c.Mp), ctl:pair("Md","Mp"),
+              act:(w, L) => { w.blocks.push(fresh("M", c.Md*RAD, c.Mp*RAD)); L.M = ["fresh", ""]; }});
+      S.push({key:"meet", cls:"m", name:"the meeting · M meets P", op:() => "[CNOT P→M]", ctl:[],
+              act:(w, L) => { meetW(w, "P", "M"); L.M = ["copied upper", "copied lower"]; }});
+    }
+    S.push({key:"delay", cls:"p", name:"delay φ on the lower arm", op:() => "[P(" + c.phi + "°) on P]", ctl:[{k:"phi", label:"φ", max:360, step:5}],
+            act:(w) => onBlock(w, "P", b => phaseT(b, "P", c.phi*RAD))});
+    S.push({key:"join", cls:"p", name:"the join · the halfway turn", op:() => turnOp(c.join), ctl:[{k:"join", label:"dial", max:90, step:5}],
+            act:(w, L) => { onBlock(w, "P", b => turnT(b, "P", c.join*RAD)); L.P = ["det 0", "det 1"]; }});
+    S.push({key:"D1", cls:"d", name:"detector particle D1 arrives", op:() => arriveOp(c.Dd, c.Dp), ctl:pair("Dd","Dp"),
+            act:(w, L) => { w.blocks.push(fresh("D1", c.Dd*RAD, c.Dp*RAD)); L.D1 = ["fresh", ""]; }});
+    S.push({key:"meetD", cls:"d", name:"D1 meets P", op:() => "[CNOT P→D1]", ctl:[],
+            act:(w, L) => { meetW(w, "P", "D1"); L.D1 = ["copied det 0", "copied det 1"]; }});
+    S.push({key:"settleD", cls:"d", name:"D1 settles · P lands", op:() => "[measure P, D1]", ctl:[],
+            act:(w, L, tag) => settleW(w, "P", "D1", tag)});
+    if(withM){
+      S.push({key:"late", cls:"m", name:"the late choice · M's own turn", op:() => turnOp(c.late), ctl:[{k:"late", label:"dial", max:90, step:5}],
+              act:(w, L) => { onBlock(w, "M", b => turnT(b, "M", c.late*RAD)); if(c.late) L.M = ["turned M: 0", "turned M: 1"]; }});
+      S.push({key:"D2", cls:"d2", name:"M's reader D2 arrives", op:() => arriveOp(c.D2d, c.D2p), ctl:pair("D2d","D2p"),
+              act:(w, L) => { w.blocks.push(fresh("D2", c.D2d*RAD, c.D2p*RAD)); L.D2 = ["fresh", ""]; }});
+      S.push({key:"meetD2", cls:"d2", name:"D2 meets M", op:() => "[CNOT M→D2]", ctl:[],
+              act:(w, L) => { meetW(w, "M", "D2"); L.D2 = ["copied M: 0", "copied M: 1"]; }});
+      S.push({key:"settleD2", cls:"d2", name:"D2 settles · M is read", op:() => "[measure M, D2]", ctl:[],
+              act:(w, L, tag) => settleW(w, "M", "D2", tag)});
+    }
+    return S;
+  }
+  function runAll(c, withM, tag){                  // every station in order; one snapshot per station
+    const S = stations(c, withM), snaps = [];
+    let w = {blocks:[], facts:[]}, L = {};
+    S.forEach(s => { w = clone(w); L = Object.assign({}, L); const rec = s.act(w, L, tag); snaps.push({w:w, L:L, rec:rec || null}); });
+    return {S:S, snaps:snaps};
+  }
+
+  // ---- the key: the same stations with no settlement, read off the final table ----------------
+  function exactKey(c, withM){
+    let w = {blocks:[], facts:[]}; const L = {};
+    stations(c, withM).forEach(s => { if(s.key !== "settleD" && s.key !== "settleD2") s.act(w, L); });
+    let B = w.blocks[0]; for(let i=1;i<w.blocks.length;i++) B = product(B, w.blocks[i]);
+    const kd = bit(B, "D1"), k2 = withM ? bit(B, "D2") : -1;
+    const n = [[0,0],[0,0]];                         // n[d2][d]
+    B.Z.forEach((z, i) => { n[k2 >= 0 ? (i >> k2) & 1 : 0][(i >> kd) & 1] += abs2(z); });
+    const g = r => (r[0] + r[1]) ? r[0] / (r[0] + r[1]) : NaN;
+    return {all: n[0][0] + n[1][0], g0: g(n[0]), g1: g(n[1])};
+  }
+
+  // ---- the walkthrough state -------------------------------------------------------------
+  const st = {seed:1, run:null};
+  function recompute(){ chains = {}; st.run = runAll(cfg, mOn, "photon " + st.seed + ":"); }
+
+  // ---- drawing a table ---------------------------------------------------------------------
+  const NS = "http://www.w3.org/2000/svg";
+  function cellNode(z, dead, posted){
+    const d = document.createElement("div"); d.className = "cell" + (dead ? " dead" : "") + (posted ? " posted" : "");
+    const svg = document.createElementNS(NS, "svg"); svg.setAttribute("viewBox", "0 0 60 60");
+    const add = (tag, at) => { const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); svg.appendChild(e); };
+    add("circle", {cx:30, cy:30, r:26, fill:"var(--sunk)", stroke:"var(--rule)"});
+    if(abs2(z) > 1e-5){
+      add("line", {x1:30, y1:30, x2:30 + 26*z.re, y2:30 - 26*z.im, stroke:"var(--ink)", "stroke-width":3, "stroke-linecap":"round"});
+      add("circle", {cx:30 + 26*z.re, cy:30 - 26*z.im, r:3.6, fill:"var(--ink)"});
+    } else add("circle", {cx:30, cy:30, r:2.6, fill:"var(--muted)"});
+    d.appendChild(svg);
+    const num = document.createElement("div"); num.className = "num"; num.textContent = fmt(z); d.appendChild(num);
+    return d;
+  }
+  function axl(name, v, L){
+    const s = document.createElement("div"); s.className = "axl " + CLS[name];
+    const m = L && L[name] && L[name][v] ? "<small>" + L[name][v] + "</small>" : "";
+    s.innerHTML = name + " = " + v + m; return s;
+  }
+  // mark(idx) -> {dead, posted}; 1 thread: a column; 2 threads: rows x columns; 3: two 2x2 blocks, one per 3rd thread
+  function tableNode(B, L, mark){
+    const wrap = document.createElement("div"); wrap.className = "tblwrap";
+    const cap = document.createElement("div"); cap.className = "tcap";
+    cap.textContent = B.th.length === 1 ? B.th[0] + "'s table · 2 cells" : "one table: " + B.th.join(" × ") + " · " + B.Z.length + " cells";
+    wrap.appendChild(cap);
+    const cell = idx => { const mk = mark ? mark(idx) : {}; return cellNode(B.Z[idx], mk.dead, mk.posted); };
+    const grid2 = (a, b, off) => {
+      const g = document.createElement("div"); g.className = "tbl"; g.style.gridTemplateColumns = "auto auto auto";
+      g.appendChild(document.createElement("div")); g.appendChild(axl(b, 0, L)); g.appendChild(axl(b, 1, L));
+      for(let va=0;va<2;va++){ g.appendChild(axl(a, va, L)); for(let vb=0;vb<2;vb++) g.appendChild(cell(off + 2*va + vb)); }
+      return g;
+    };
+    if(B.th.length === 1){
+      const g = document.createElement("div"); g.className = "tbl"; g.style.gridTemplateColumns = "auto auto";
+      for(let v=0;v<2;v++){ g.appendChild(axl(B.th[0], v, L)); g.appendChild(cell(v)); }
+      wrap.appendChild(g);
+    } else if(B.th.length === 2) wrap.appendChild(grid2(B.th[0], B.th[1], 0));
+    else {
+      const bl = document.createElement("div"); bl.className = "blocks";
+      const [a, b, c] = B.th;                        // index = 4a + 2b + c: split by c into two a x b grids
+      for(let vc=0;vc<2;vc++){
+        const sub = document.createElement("div"); sub.className = "sub";
+        const t = document.createElement("div"); t.className = "axl " + CLS[c]; t.innerHTML = "<b>" + c + " = " + vc + "</b>" + (L[c] && L[c][vc] ? " · " + L[c][vc] : ""); sub.appendChild(t);
+        const g = document.createElement("div"); g.className = "tbl"; g.style.gridTemplateColumns = "auto auto auto";
+        g.appendChild(document.createElement("div")); g.appendChild(axl(b, 0, L)); g.appendChild(axl(b, 1, L));
+        for(let va=0;va<2;va++){ g.appendChild(axl(a, va, L)); for(let vb=0;vb<2;vb++) g.appendChild(cell(4*va + 2*vb + vc)); }
+        sub.appendChild(g); bl.appendChild(sub);
+      }
+      wrap.appendChild(bl);
+    }
+    return wrap;
+  }
+  function chipsNode(facts){
+    const c = document.createElement("div"); c.className = "chips";
+    facts.forEach(f => { const s = document.createElement("span"); s.className = "chip"; s.textContent = "signed: " + f.a + " = " + f.va + ", " + f.b + " = " + f.vb; c.appendChild(s); });
+    return c;
+  }
+
+  // ---- what each station says --------------------------------------------------------------
+  function sayFor(key, snap, prev){
+    const w = snap.w, r = snap.rec;
+    switch(key){
+      case "P": return "<p>The photon P arrives: one thread, two cells. With the default dials all its length sits in cell 0, so there is one arrow and an empty cell.</p><p>The dial and the phase let a particle arrive already turned. That is for play. The real photon is the default, 0 and 0.</p><p>There are no dice on this page. Each book draws from a fixed chain named after the photon, so reloading shows the same photon signing the same lines. <b>Next photon</b> takes the next one; over many photons the lines come out in the length² shares, as the counts below show.</p>";
+      case "split": return "<p>The halfway turn: a 45° dial moves <b>half</b> the length across, until both cells hold 0.71. Their squares add to 1. The length that crosses arrives turned by 90° (the i of the turn), so the lower arm reads 0.71i. The cells now mean <b>upper arm</b> and <b>lower arm</b>.</p><p>Still one thread, and nothing is entangled. The photon is not in one arm or the other. It is two cells.</p><p>Try 0°: no splitter, one arm only, and the fringe will never come. At 90° all the length moves across.</p>";
+      case "M": return "<p>The marker M arrives beside the arms, fresh. It has its <b>own</b> table: two threads, two separate tables. Nothing ties them yet.</p><p>Being blank is what makes M a clean marker: the swap at the next station will copy P's arm into it without changing P's arrows.</p>";
+      case "meet": return "<p>The meeting: first the <b>product</b>, which writes the two tables as one table of 4 cells. Then the <b>swap</b>: where P = 1 (the lower arm), M's cells trade places. Now the upper arm sits with M = 0 and the lower arm with M = 1.</p><p>This is a meeting, not a settlement. No book has signed anything. It is a <b>promise</b>: M's cells are now tied to P's arms, and nobody, M included, has an answer. An untouched M alone knows nothing. The which-arm tie lives only in the pair.</p>";
+      case "delay": return "<p>The lower arm's arrow turns by φ. Its length does not change, only its direction: a delay never moves length between cells." + (mOn ? " With M on the table, the delay turns every cell where P = 1, in both of M's columns." : "") + "</p>";
+      case "join": return mOn
+        ? "<p>The same halfway turn on P. But the two arms no longer meet: the upper arm lives in the M = 0 column and the lower arm in the M = 1 column. Each cell gets only <b>one</b> arm's arrow. There is nothing to add, so nothing can cancel.</p><p>Look at the P = 0 row: at every φ it holds the same total. <b>The fringe is gone, and nobody has read M.</b> The marker collapsed nothing. It only put the two arms into different lines.</p>"
+        : "<p>The same halfway turn again, the second half-silvered mirror. It brings both arms into each cell, and in each cell the two arms' arrows <b>add</b>. The cells now mean <b>detector 0</b> and <b>detector 1</b>.</p><p>Where the two arrows point opposite ways, the cell empties: at φ = 0 detector 0 gets nothing. Move φ and the cell fills and empties again. That is the fringe, before a single fact is written.</p>";
+      case "D1": return "<p>The detector is a thread too. D1 is the first particle of the detector that P hits. It arrives fresh, with its own table, like M did.</p>";
+      case "meetD": return "<p>D1 meets P: the product, then the swap where P = 1. D1 now copies P's detector cell." + (mOn ? " With M, the table has <b>8 cells</b>, P × M × D1, drawn as two blocks: one for D1 = 0 and one for D1 = 1. Only the cells where D1 agrees with P hold length." : " The table has 4 cells, and only the two where D1 agrees with P hold length.") + "</p><p>Still a promise. A meeting alone signs nothing.</p>";
+      case "settleD": return "<p>Now the settlement of the last episode. P's book and D1's book lay the lines' lengths end to end, and each draws. <b>The same line twice is a fact</b>; different lines are a refusal, and both sign again. Signed: <b>P = " + r.va + ", D1 = " + r.vb + "</b>, the photon at detector " + r.vb + ".</p>" + (mOn
+        ? "<p>The signed line stays and the others go. What is left open is <b>M's own table</b>, rescaled so its squares add to 1. M is still a promise, and the photon has already landed.</p>"
+        : "<p>Nothing is left open: every thread on this run is signed. Count many photons below, and the facts draw the fringe.</p>");
+      case "late": return "<p>The late choice: a turn on <b>M only</b>, with its own dial. P and D1 are signed already, and nothing here touches them.</p><p><b>45°</b> is M's own join. It mixes M's two cells, so M's answer no longer names an arm. <b>0°</b> means M is read as it is: its answer names the arm, and the sorted groups show no fringe. <b>90°</b> swaps the labels, so the groups are flat again. In between you get partial fringes, with strength sin(2 × dial).</p><p>Nothing is erased. The turn is reversible, and turned back, M would name the arm again. It only points M's question somewhere else.</p>";
+      case "D2": return "<p>M's reader, D2, arrives fresh: the first particle of the detector that M hits.</p>";
+      case "meetD2": return "<p>D2 meets M: the same product and swap. D2 copies M's cell. Still a promise.</p>";
+      case "settleD2": return "<p>M's book and D2's book sign. Signed: <b>M = " + r.va + ", D2 = " + r.vb + "</b>. The whole run is now facts: the photon's detector, and D2's answer.</p><p>One run proves nothing. Count many runs below, and sort the photons by D2's answer. With the late dial at 45°, each group shows a fringe, and the two fringes are opposite, so they add up flat. The choice was made after every photon had landed. It decided which lines M's books would sign. It never changed P's fact.</p>";
+    }
+    return "";
+  }
+  function ticksNode(r){
+    const d = document.createElement("details"); d.className = "ticks";
+    const s = document.createElement("summary"); s.textContent = "the signing, tick by tick"; d.appendChild(s);
+    const nm = k => r.a + "=" + (k >> 1) + "," + r.b + "=" + (k & 1);
+    const lines = ["ruler (lengths end to end): " + [0,1,2,3].filter(k => r.share[k] > 0).map(k => nm(k) + " " + r.share[k].toFixed(3)).join("   ")];
+    r.ticks.forEach((t, i) => lines.push("tick " + (i+1) + ":  " + r.a + "'s book " + t.ua.toFixed(3) + " → " + nm(t.sa) + "    " + r.b + "'s book " + t.ub.toFixed(3) + " → " + nm(t.sb) + "    " + (t.sa === t.sb ? "the same: a fact" : "<span class='flag'>different: a refusal, sign again</span>")));
+    const w = document.createElement("div"); w.className = "work"; w.innerHTML = lines.join("\n"); d.appendChild(w);
+    return d;
+  }
+
+  // ---- rendering the conveyor: the stations are built once (per M on/off); every change refreshes the rest --
+  let rowsDom = [];
+  const FOCUS = {P:"P", split:"P", M:"M", meet:"M", delay:"P", join:"P", D1:"D1", meetD:"D1", late:"M", D2:"D2", meetD2:"D2"};
+  function build(){
+    const belt = $("belt"); belt.innerHTML = ""; rowsDom = [];
+    stations(cfg, true).forEach((s, i) => {
+      const row = document.createElement("div"); row.className = "row";
+      const tb = document.createElement("div"); tb.className = "tables";
+      const tr = document.createElement("div"); tr.className = "track";
+      const card = document.createElement("div"); card.className = "station " + s.cls;
+      card.innerHTML = "<div class='nm'><span class='k'>" + (i+1) + "</span>" + s.name + "</div><div class='op'></div>";
+      const outs = [];
+      if(s.ctl.length){
+        const ctl = document.createElement("div"); ctl.className = "ctl";
+        s.ctl.forEach(c => {
+          const id = "c-" + c.k;
+          const lab = document.createElement("label"); lab.htmlFor = id; lab.textContent = c.label;
+          const inp = document.createElement("input"); inp.type = "range"; inp.id = id; inp.min = 0; inp.max = c.max; inp.step = c.step; inp.value = cfg[c.k];
+          const out = document.createElement("span"); out.className = "out";
+          inp.addEventListener("input", () => { cfg[c.k] = parseInt(inp.value, 10); changed(); });
+          ctl.appendChild(lab); ctl.appendChild(inp); ctl.appendChild(out);
+          outs.push({k:c.k, out:out, inp:inp});
+        });
+        card.appendChild(ctl);
+      }
+      if(s.key === "P"){
+        const nx = document.createElement("div"); nx.className = "nextp";
+        const lab = document.createElement("span"); lab.id = "pno";
+        const bt = document.createElement("button"); bt.type = "button"; bt.textContent = "next photon";
+        bt.addEventListener("click", () => { st.seed++; recompute(); refresh(); });
+        nx.appendChild(lab); nx.appendChild(bt); card.appendChild(nx);
+      }
+      if(s.key === "M"){
+        card.classList.add("hastog");
+        const tg = document.createElement("label"); tg.className = "mtog"; tg.title = "marker M present";
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.id = "mon"; cb.checked = mOn;
+        cb.addEventListener("change", () => { mOn = cb.checked; changed(); });
+        tg.appendChild(cb); tg.appendChild(document.createTextNode("on")); card.appendChild(tg);
+      }
+      tr.appendChild(card);
+      const sy = document.createElement("div"); sy.className = "say";
+      row.appendChild(tb); row.appendChild(tr); row.appendChild(sy); belt.appendChild(row);
+      rowsDom.push({key:s.key, row:row, tb:tb, op:card.querySelector(".op"), sy:sy, outs:outs});
+    });
+  }
+  function refresh(){
+    const {S, snaps} = st.run, full = stations(cfg, true);
+    $("pno").textContent = "photon no. " + st.seed;
+    full.forEach((s, fi) => {
+      const d = rowsDom[fi], i = S.findIndex(x => x.key === s.key), tb = d.tb;
+      tb.innerHTML = "";
+      d.row.classList.toggle("off", i < 0);
+      d.op.textContent = s.op();
+      d.outs.forEach(o => { o.out.textContent = cfg[o.k] + "°"; o.out.classList.toggle("off", cfg[o.k] !== DEF[o.k]); if(+o.inp.value !== cfg[o.k]) o.inp.value = cfg[o.k]; o.inp.disabled = i < 0; });
+      if(i < 0){ d.sy.innerHTML = "<p>The marker is off, so this station is skipped.</p>"; return; }
+      const snap = snaps[i], prev = i ? snaps[i-1] : null;
+      if(snap.rec){                                  // a settlement: the table before, the signed line, then what is left
+        const r = snap.rec, B = r.before;
+        tb.appendChild(tableNode(B, prev.L, idx => { const hit = ((idx >> r.ka) & 1) === r.va && ((idx >> r.kb) & 1) === r.vb; return {dead:!hit, posted:hit}; }));
+        const a = document.createElement("div"); a.className = "arrowdn"; a.textContent = "↓ signed, the rest goes"; tb.appendChild(a);
+        tb.appendChild(chipsNode(snap.w.facts));
+        if(snap.w.blocks.length) snap.w.blocks.forEach(b => tb.appendChild(tableNode(b, snap.L)));
+        else { const n = document.createElement("div"); n.className = "none"; n.textContent = "nothing left open"; tb.appendChild(n); }
+      } else {                                       // only the table this station touched: what came before is above
+        const b = snap.w.blocks[find(snap.w, FOCUS[s.key])];
+        if(b) tb.appendChild(tableNode(b, snap.L));
+      }
+      const open = d.sy.querySelector("details.ticks[open]") !== null;
+      d.sy.innerHTML = sayFor(s.key, snap, prev);
+      if(snap.rec){ const t = ticksNode(snap.rec); t.open = open; d.sy.appendChild(t); }
+    });
+  }
+  let recountTimer = null;
+  function changed(rebuild){                     // any dial or the switch: the whole run again, then the counts
+    recompute(); if(rebuild) build(); refresh();
+    clearTimeout(recountTimer); recountTimer = setTimeout(count, 350);
+  }
+
+  // ---- counting ----------------------------------------------------------------------------------
+  const SERIES = [
+    {id:"noM",   col:"var(--p)",  dot:false, on:true,  label:"no marker: all photons", m:false, pick:"all"},
+    {id:"all",   col:"var(--ink)", dot:false, on:true, label:"with M: all photons", m:true, late:null, pick:"all"},
+    {id:"g0",    col:"var(--m)",  dot:false, on:true,  label:"with M, late dial as set: D2 said 0", m:true, late:null, pick:"g0"},
+    {id:"g1",    col:"var(--d)",  dot:false, on:true,  label:"with M, late dial as set: D2 said 1", m:true, late:null, pick:"g1"},
+    {id:"a0",    col:"var(--m)",  dot:true,  on:false, label:"with M read as it is (late dial 0°): D2 said 0", m:true, late:0, pick:"g0"},
+    {id:"a1",    col:"var(--d)",  dot:true,  on:false, label:"with M read as it is (late dial 0°): D2 said 1", m:true, late:0, pick:"g1"}
+  ];
+  let rows = null, countSeed = 0;
+  function renderSeries(){
+    const box = $("series"); box.innerHTML = "";
+    SERIES.forEach(s => {
+      const l = document.createElement("label"); l.style.setProperty("--col", s.col);
+      const c = document.createElement("input"); c.type = "checkbox"; c.checked = s.on; c.addEventListener("change", () => { s.on = c.checked; renderChart(); });
+      const sw = document.createElement("i"); if(s.dot) sw.className = "dot";
+      const t = document.createElement("span"); t.textContent = s.label;
+      l.appendChild(c); l.appendChild(sw); l.appendChild(t); box.appendChild(l);
+    });
+  }
+  function renderChart(){
+    const svg = $("chart"); svg.innerHTML = "";
+    const W = 720, H = 290, Lm = 62, R = 16, Tp = 14, B = 40;
+    const x = d => Lm + (W-Lm-R) * d / 360, y = v => Tp + (H-Tp-B) * (1 - v);
+    const el = (tag, at, txt) => { const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); if(txt != null) e.textContent = txt; svg.appendChild(e); return e; };
+    [0,.25,.5,.75,1].forEach(v => { el("line", {x1:Lm, x2:W-R, y1:y(v), y2:y(v), stroke:"var(--rule)"}); el("text", {x:Lm-8, y:y(v)+4, "text-anchor":"end", "font-size":11, "font-family":"IBM Plex Mono, monospace", fill:"var(--muted)"}, v.toFixed(2)); });
+    [0,90,180,270,360].forEach(d => el("text", {x:x(d), y:y(0)+20, "text-anchor":"middle", "font-size":11, "font-family":"IBM Plex Mono, monospace", fill:"var(--muted)"}, d + "°"));
+    el("text", {x:(Lm+W-R)/2, y:H-4, "text-anchor":"middle", "font-size":11, "font-family":"IBM Plex Sans, sans-serif", fill:"var(--muted)"}, "delay φ");
+    el("text", {x:14, y:(Tp+H-B)/2, "text-anchor":"middle", "font-size":11, "font-family":"IBM Plex Sans, sans-serif", fill:"var(--muted)", transform:"rotate(-90 14 " + ((Tp+H-B)/2) + ")"}, "share with D1 = 0");
+    if(!rows) return;
+    SERIES.filter(s => s.on).forEach(s => {
+      const line = pts => pts.filter(p => !isNaN(p[1])).map((p,i) => (i ? "L" : "M") + x(p[0]).toFixed(1) + " " + y(p[1]).toFixed(1)).join(" ");
+      el("path", {d: line(rows.map(r => [r.d, r[s.id].key])), fill:"none", stroke:s.col, "stroke-width":1.3, "stroke-dasharray":"4 4", opacity:.8});
+      const cp = rows.map(r => [r.d, r[s.id].counted]);
+      el("path", {d: line(cp), fill:"none", stroke:s.col, "stroke-width":2.2, "stroke-dasharray": s.dot ? "1 5" : "none", "stroke-linecap":"round"});
+      cp.forEach(p => { if(!isNaN(p[1])) el("circle", {cx:x(p[0]), cy:y(p[1]), r:2.5, fill:s.col}); });
+    });
+  }
+  function count(){
+    $("count").disabled = true; $("status").textContent = "counting…";
+    setTimeout(() => {
+      const n = parseInt($("nshots").value, 10); countSeed++; chains = {};
+      const configs = {noM:{m:false, late:cfg.late}, set:{m:true, late:cfg.late}, asis:{m:true, late:0}};
+      const out = [];
+      for(let k=0;k<=24;k++){
+        const d = k*15, row = {d:d}, res = {};
+        for(const name in configs){
+          const cf = configs[name], c = Object.assign({}, cfg, {phi:d, late:cf.late});
+          const t = {all:[0,0], g0:[0,0], g1:[0,0]};
+          for(let i=0;i<n;i++){
+            const run = runAll(c, cf.m, "count" + countSeed + ":");
+            const f = run.snaps[run.snaps.length - 1].w.facts, dv = f[0].vb, hit = dv === 0 ? 1 : 0;
+            t.all[0] += hit; t.all[1]++;
+            if(cf.m){ const g = f[1].vb ? t.g1 : t.g0; g[0] += hit; g[1]++; }
+          }
+          const q = a => a[1] ? a[0] / a[1] : NaN;
+          res[name] = {counted:{all:q(t.all), g0:q(t.g0), g1:q(t.g1)}, key:exactKey(c, cf.m)};
+        }
+        SERIES.forEach(s => { const src = !s.m ? res.noM : (s.late === 0 ? res.asis : res.set); row[s.id] = {counted:src.counted[s.pick], key:src.key[s.pick]}; });
+        out.push(row);
+      }
+      chains = {}; recompute();
+      rows = out; renderChart();
+      $("status").textContent = (3*25*n).toLocaleString() + " runs counted, with the dials as set (late dial " + cfg.late + "°). Each run is the whole conveyor above: every settlement signed by two books.";
+      $("count").disabled = false;
+    }, 20);
+  }
+  $("count").addEventListener("click", count);
+  $("nshots").addEventListener("change", count);
+
+  renderSeries(); renderChart();
+  recompute(); build(); refresh(); count();
+})();
+</script>

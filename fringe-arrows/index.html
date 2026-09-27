@@ -1,0 +1,228 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fringe Arrows</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+  :root{
+    --ground:#f6f5f1; --surface:#ffffff; --sunk:#efece5;
+    --ink:#23201c; --muted:#77736c; --rule:#e0dbd2;
+    --p:#c07016; --m:#6b4fbb; --d:#12806f; --d2:#2d64a8; --brown:#8a5a2b;
+    --shadow:0 1px 2px rgba(35,32,28,.06), 0 8px 24px rgba(35,32,28,.05);
+    --serif:"IBM Plex Serif",Georgia,serif;
+    --sans:"IBM Plex Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+    --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      color-scheme:dark;
+      --ground:#181715; --surface:#221f1c; --sunk:#1e1c1a;
+      --ink:#ece6dc; --muted:#98918a; --rule:#35322d;
+      --p:#e09a45; --m:#a48ce8; --d:#46bda9; --d2:#72a3e3; --brown:#c99463;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.3);
+    }
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --ground:#181715; --surface:#221f1c; --sunk:#1e1c1a;
+    --ink:#ece6dc; --muted:#98918a; --rule:#35322d;
+    --p:#e09a45; --m:#a48ce8; --d:#46bda9; --d2:#72a3e3; --brown:#c99463;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 28px rgba(0,0,0,.3);
+  }
+  *{box-sizing:border-box}
+  body{background:var(--ground);color:var(--ink);font-family:var(--sans);line-height:1.5;margin:0}
+  .wrap{max-width:1040px;margin:0 auto;padding-inline:16px;padding-block:32px 56px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,38px);line-height:1.1;margin:.2em 0 .2em;text-wrap:balance}
+  h2{font-family:var(--serif);font-weight:600;font-size:19px;margin:0 0 6px;text-wrap:balance}
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:0}
+  .lede{color:var(--muted);max-width:70ch;margin:0 0 20px}
+  .controls{position:sticky;top:env(safe-area-inset-top,0px);z-index:2;background:var(--ground);padding-block:10px;border-bottom:1px solid var(--rule);display:flex;flex-wrap:wrap;gap:10px 28px;align-items:center;margin-bottom:20px}
+  .ctl{display:flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px}
+  .ctl label{min-width:9ch}
+  .ctl input{width:170px;accent-color:var(--p)}
+  .ctl output{min-width:5ch;text-align:right;font-variant-numeric:tabular-nums}
+  .ctl .off{color:var(--p);font-weight:600}
+  button{font-family:var(--mono);font-size:12px;background:var(--surface);color:var(--ink);border:1px solid var(--rule);border-radius:6px;padding:6px 10px;cursor:pointer}
+  button:focus-visible,input:focus-visible{outline:2px solid var(--d2);outline-offset:2px}
+  .stage{background:var(--surface);border:1px solid var(--rule);border-radius:10px;box-shadow:var(--shadow);padding:18px;margin-bottom:18px;display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:18px 24px}
+  .stage .text{grid-column:1 / -1;max-width:78ch;color:var(--ink);margin:0}
+  .stage .text b{font-weight:600}
+  .planes{display:flex;flex-wrap:wrap;gap:12px}
+  .plane{flex:1 1 180px;min-width:0;max-width:270px}
+  .plane svg,.chart svg{width:100%;height:auto;display:block}
+  .cap{font-family:var(--mono);font-size:12px;color:var(--muted);margin:4px 0 0;font-variant-numeric:tabular-nums}
+  .key{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:6px}
+  .sw{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:5px;border-radius:2px}
+  @media (max-width:760px){ .stage{grid-template-columns:minmax(0,1fr)} }
+</style>
+
+<div class="wrap">
+  <p class="eyebrow">#18 bench companion · the arrow picture</p>
+  <h1>How an angle becomes a fringe</h1>
+  <p class="lede">Each cell of a table holds an arrow. Detector 0 collects the arrows that end there, and its share is the length² of their sum. Three stages below, same numbers as the bench (toy turn, all dials at 45° unless you move them).</p>
+
+  <div class="controls">
+    <div class="ctl"><label for="phi">delay φ</label><input id="phi" type="range" min="0" max="360" step="1" value="60"><output id="phiO">60°</output></div>
+    <div class="ctl"><label for="late">late θ</label><input id="late" type="range" min="-90" max="90" step="1" value="45"><output id="lateO">45°</output></div>
+    <div class="ctl"><label for="tw">M twist τ</label><input id="tw" type="range" min="-180" max="180" step="1" value="0"><output id="twO">0°</output></div>
+    <button id="reset" type="button">Reset</button>
+  </div>
+
+  <section class="stage">
+    <div>
+      <p class="eyebrow">stage 1 · no marker</p>
+      <h2>Two arrows, tip to tail</h2>
+      <div class="planes"><div class="plane" id="pl1"></div></div>
+      <p class="cap" id="cap1"></p>
+    </div>
+    <div class="chart" id="ch1"></div>
+    <p class="text">Both arms end at detector 0. The upper arm brings a fixed arrow (blue). The lower arm's arrow (orange) is turned by the delay φ; the join's two <i>i</i>'s flip it by 180° on top, so at φ = 0 the two point opposite and <b>cancel: dark</b>. At φ = 180° they line up and <b>add: bright</b>. The black arrow is the sum. Drag φ and the dot walks along the brown curve, sin²(φ/2). The fringe <b>is</b> the angle between two arrows.</p>
+  </section>
+
+  <section class="stage">
+    <div>
+      <p class="eyebrow">stage 2 · M present, before the late choice</p>
+      <h2>Same two arrows, different cells</h2>
+      <div class="planes"><div class="plane" id="pl2a"></div><div class="plane" id="pl2b"></div></div>
+      <p class="cap" id="cap2"></p>
+    </div>
+    <div class="chart" id="ch2"></div>
+    <p class="text">The meeting copied the arm into M. So at detector 0 the upper arrow sits in the cell with M = 0 and the lower arrow in the cell with M = 1. <b>Arrows in different cells never add.</b> Each is worth 0.25 whatever φ is, total 0.5: the flat black line. Nothing cancelled. The angle between the arrows is still exactly what it was in stage 1; the table just never puts them together.</p>
+  </section>
+
+  <section class="stage">
+    <div>
+      <p class="eyebrow">stage 3 · late turn on M, then sort by D2</p>
+      <h2>The turn puts the arrows back together, one quarter-turn off</h2>
+      <div class="planes"><div class="plane" id="pl3a"></div><div class="plane" id="pl3b"></div></div>
+      <p class="cap" id="cap3"></p>
+    </div>
+    <div class="chart" id="ch3"></div>
+    <p class="text">The late turn mixes M's two cells, so each D2 answer gets a piece of <b>both</b> arrows and they can add again. The group D2 = 0 gets cos θ of the upper arrow and <i>i</i>·sin θ of the lower one. That <i>i</i> is a quarter turn (+90°) of the crossed-over arrow, and it is the whole ±90° shift. Try it: <b>τ = −90°</b> twists M's lower cell back before the turn and D2 = 0 lands on brown. <b>θ = −45°</b> makes the <i>i</i> a −<i>i</i>, so the groups just swap shifts. <b>θ = 0°</b> mixes nothing and both groups go flat. (Group arrows are drawn ×√2, since each group holds half the photons, so length² reads as the group's share.)</p>
+  </section>
+</div>
+
+<script>
+(function(){
+  const R = Math.PI/180;
+  const C = (re,im) => ({re, im});
+  const add = (a,b) => C(a.re+b.re, a.im+b.im);
+  const mul = (a,b) => C(a.re*b.re - a.im*b.im, a.re*b.im + a.im*b.re);
+  const sc = (a,k) => C(a.re*k, a.im*k);
+  const ex = t => C(Math.cos(t), Math.sin(t));
+  const I = C(0,1);
+  const len2 = a => a.re*a.re + a.im*a.im;
+  const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const NS = 'http://www.w3.org/2000/svg';
+  const DEF = {phi:60, late:45, tw:0};
+  const el = id => document.getElementById(id);
+
+  // amplitudes at detector 0, toy convention (bench: splitter 45, join 45)
+  const upper = () => C(0.5, 0);
+  const lower = phi => mul(C(-0.5, 0), ex(phi*R));
+  function groups(phi, th, tw){
+    const a = upper(), b = mul(lower(phi), ex(tw*R)), c = Math.cos(th*R), s = Math.sin(th*R), k = Math.SQRT2;
+    return {
+      g0: [sc(a, c*k), sc(mul(I, b), s*k)],
+      g1: [sc(mul(I, a), s*k), sc(b, c*k)]
+    };
+  }
+  const share = arr => len2(arr.reduce(add, C(0,0)));
+
+  function svg(w, h){ const s = document.createElementNS(NS,'svg'); s.setAttribute('viewBox', `0 0 ${w} ${h}`); return s; }
+  function node(s, tag, at){ const e = document.createElementNS(NS, tag); for(const k in at) e.setAttribute(k, at[k]); s.appendChild(e); return e; }
+
+  function arrow(s, x0, y0, x1, y1, color, w){
+    const dx = x1-x0, dy = y1-y0, L = Math.hypot(dx, dy);
+    if(L < 0.5) return;
+    const ux = dx/L, uy = dy/L, h = Math.min(9, L*0.45), bx = x1 - ux*h, by = y1 - uy*h;
+    node(s, 'line', {x1:x0, y1:y0, x2:bx, y2:by, stroke:color, 'stroke-width':w, 'stroke-linecap':'round'});
+    node(s, 'polygon', {points:`${x1},${y1} ${bx-uy*h*0.5},${by+ux*h*0.5} ${bx+uy*h*0.5},${by-ux*h*0.5}`, fill:color});
+  }
+
+  // a complex plane with arrows drawn tip to tail, plus their sum
+  function plane(host, title, arrows, showSum){
+    const W = 220, H = 220, cx = 110, cy = 118, u = 80;
+    const s = svg(W, H);
+    node(s, 'rect', {x:0, y:0, width:W, height:H, rx:8, fill:css('--sunk')});
+    node(s, 'circle', {cx, cy, r:u, fill:'none', stroke:css('--rule'), 'stroke-width':1});
+    node(s, 'circle', {cx, cy, r:u/2, fill:'none', stroke:css('--rule'), 'stroke-width':1, 'stroke-dasharray':'3 3'});
+    node(s, 'line', {x1:cx-u-8, y1:cy, x2:cx+u+8, y2:cy, stroke:css('--rule'), 'stroke-width':1});
+    node(s, 'line', {x1:cx, y1:cy-u-8, x2:cx, y2:cy+u+8, stroke:css('--rule'), 'stroke-width':1});
+    const t = node(s, 'text', {x:10, y:18, fill:css('--muted'), 'font-family':css('--mono'), 'font-size':11});
+    t.textContent = title;
+    let tip = C(0,0);
+    for(const a of arrows){
+      const nt = add(tip, a.z);
+      arrow(s, cx + tip.re*u, cy - tip.im*u, cx + nt.re*u, cy - nt.im*u, a.color, 3);
+      tip = nt;
+    }
+    if(showSum) arrow(s, cx, cy, cx + tip.re*u, cy - tip.im*u, css('--ink'), 2.2);
+    host.replaceChildren(s);
+  }
+
+  // share at detector 0 versus φ
+  function chart(host, series, phi){
+    const W = 340, H = 210, L = 38, Rm = 12, T = 12, B = 30, pw = W-L-Rm, ph = H-T-B;
+    const X = d => L + d/360*pw, Y = v => T + (1-v)*ph;
+    const s = svg(W, H);
+    const mono = css('--mono'), muted = css('--muted'), rule = css('--rule');
+    for(const v of [0, 0.5, 1]){
+      node(s, 'line', {x1:L, y1:Y(v), x2:W-Rm, y2:Y(v), stroke:rule, 'stroke-width':1});
+      const t = node(s, 'text', {x:L-6, y:Y(v)+4, 'text-anchor':'end', fill:muted, 'font-family':mono, 'font-size':10}); t.textContent = v.toFixed(1);
+    }
+    for(const d of [0, 90, 180, 270, 360]){
+      const t = node(s, 'text', {x:X(d), y:H-12, 'text-anchor':'middle', fill:muted, 'font-family':mono, 'font-size':10}); t.textContent = d + '°';
+    }
+    const ax = node(s, 'text', {x:W-Rm, y:H-1, 'text-anchor':'end', fill:muted, 'font-family':mono, 'font-size':10}); ax.textContent = 'delay φ';
+    for(const sr of series){
+      let d = '';
+      for(let x=0; x<=360; x+=3) d += (x ? 'L' : 'M') + X(x).toFixed(1) + ' ' + Y(sr.f(x)).toFixed(1);
+      node(s, 'path', {d, fill:'none', stroke:sr.color, 'stroke-width':sr.w || 2, 'stroke-dasharray':sr.dash || 'none'});
+    }
+    node(s, 'line', {x1:X(phi), y1:T, x2:X(phi), y2:T+ph, stroke:muted, 'stroke-width':1, 'stroke-dasharray':'2 3'});
+    for(const sr of series) if(sr.dot) node(s, 'circle', {cx:X(phi), cy:Y(sr.f(phi)), r:5, fill:sr.color, stroke:css('--surface'), 'stroke-width':1.5});
+    host.replaceChildren(s);
+    const key = document.createElement('div'); key.className = 'key';
+    for(const sr of series){ const sp = document.createElement('span'); sp.innerHTML = `<span class="sw" style="background:${sr.color}"></span>${sr.name}`; key.appendChild(sp); }
+    host.appendChild(key);
+  }
+
+  function draw(){
+    const phi = +el('phi').value, th = +el('late').value, tw = +el('tw').value;
+    for(const [id, v, d] of [['phiO', phi, DEF.phi], ['lateO', th, DEF.late], ['twO', tw, DEF.tw]]){
+      el(id).textContent = v + '°'; el(id).classList.toggle('off', v !== d);
+    }
+    const blue = css('--d2'), orange = css('--p'), brownC = css('--brown'), ink = css('--ink'), purple = css('--m'), green = css('--d');
+    const brown = x => len2(add(upper(), lower(x)));
+
+    plane(el('pl1'), 'detector 0', [{z:upper(), color:blue}, {z:lower(phi), color:orange}], true);
+    el('cap1').textContent = `sum length² = ${brown(phi).toFixed(3)}   (upper 0.5 at 0°, lower 0.5 at ${((180+phi)%360)}°)`;
+    chart(el('ch1'), [{name:'no marker: sin²(φ/2)', color:brownC, f:brown, dot:true}], phi);
+
+    plane(el('pl2a'), 'detector 0, cell M = 0', [{z:upper(), color:blue}], false);
+    plane(el('pl2b'), 'detector 0, cell M = 1', [{z:lower(phi), color:orange}], false);
+    el('cap2').textContent = `0.25 + 0.25 = 0.500   (the angle is still ${((180+phi)%360)}°, but nobody adds them)`;
+    chart(el('ch2'), [
+      {name:'no marker', color:brownC, f:brown, dash:'5 4', w:1.5},
+      {name:'M present, all photons', color:ink, f:() => 0.5, dot:true}
+    ], phi);
+
+    const g = groups(phi, th, tw);
+    plane(el('pl3a'), 'group D2 = 0', [{z:g.g0[0], color:blue}, {z:g.g0[1], color:orange}], true);
+    plane(el('pl3b'), 'group D2 = 1', [{z:g.g1[0], color:blue}, {z:g.g1[1], color:orange}], true);
+    el('cap3').textContent = `D2 = 0 share ${share(g.g0).toFixed(3)}   D2 = 1 share ${share(g.g1).toFixed(3)}   average ${((share(g.g0)+share(g.g1))/2).toFixed(3)}`;
+    chart(el('ch3'), [
+      {name:'no marker', color:brownC, f:brown, dash:'5 4', w:1.5},
+      {name:'sorted D2 = 0', color:purple, f:x => share(groups(x, th, tw).g0), dot:true},
+      {name:'sorted D2 = 1', color:green, f:x => share(groups(x, th, tw).g1), dot:true},
+      {name:'average', color:ink, f:() => 0.5, w:1}
+    ], phi);
+  }
+
+  for(const id of ['phi', 'late', 'tw']) el(id).addEventListener('input', draw);
+  el('reset').addEventListener('click', () => { el('phi').value = DEF.phi; el('late').value = DEF.late; el('tw').value = DEF.tw; draw(); });
+  try{ matchMedia('(prefers-color-scheme: dark)').addEventListener('change', draw); }catch(e){}
+  new MutationObserver(draw).observe(document.documentElement, {attributes:true, attributeFilter:['data-theme']});
+  draw();
+})();
+</script>

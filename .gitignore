@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+assets/qc_order_test_ideal_*
+assets/qc_order_test_noisy_*
